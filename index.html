@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMA-03 Lite Calculator - Punto de No Retorno</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style> body { background: #0f172a; color: white; } input[type=range] { accent-color: #22c55e; } </style>
+</head>
+<body class="p-4 max-w-md mx-auto">
+<h1 class="text-2xl font-bold text-center mb-6 text-green-400">SMA-03 Lite Calculator</h1>
+<p class="text-center text-sm mb-6">Predice el Punto de No Retorno (80% precisión validada)</p>
+
+<div class="space-y-6">
+  <!-- Presiones estructurales -->
+  <div>
+    <h2 class="text-lg font-semibold mb-3">1. Presiones Estructurales (0-1)</h2>
+    <label class="block text-xs">Económica (PE): <span id="pe_val">0.5</span></label>
+    <input type="range" id="pe" min="0" max="1" step="0.01" value="0.5" class="w-full">
+    <!-- Repite para PR, PL, PS, PM (puedes copiar el bloque) -->
+    <label class="block text-xs mt-4">Reputacional (PR): <span id="pr_val">0.5</span></label>
+    <input type="range" id="pr" min="0" max="1" step="0.01" value="0.5" class="w-full">
+    <label class="block text-xs mt-4">Relacional (PL): <span id="pl_val">0.5</span></label>
+    <input type="range" id="pl" min="0" max="1" step="0.01" value="0.5" class="w-full">
+    <label class="block text-xs mt-4">Estratégica (PS): <span id="ps_val">0.5</span></label>
+    <input type="range" id="ps" min="0" max="1" step="0.01" value="0.5" class="w-full">
+    <label class="block text-xs mt-4">Emocional (PM): <span id="pm_val">0.5</span></label>
+    <input type="range" id="pm" min="0" max="1" step="0.01" value="0.5" class="w-full">
+  </div>
+
+  <!-- Creencias A -->
+  <div>
+    <h2 class="text-lg font-semibold mb-3">2. Creencias (1-5)</h2>
+    <label>Causal (C): <input type="number" id="c" value="3" min="1" max="5" class="bg-gray-800 text-white w-16 text-center"></label><br>
+    <label>Identidad (I): <input type="number" id="i" value="3" min="1" max="5" class="bg-gray-800 text-white w-16 text-center"></label><br>
+    <label>Significado (S): <input type="number" id="s" value="3" min="1" max="5" class="bg-gray-800 text-white w-16 text-center"></label>
+  </div>
+
+  <!-- Biológico B -->
+  <div>
+    <h2 class="text-lg font-semibold mb-3">3. Factores Biológicos</h2>
+    <label>Riesgo (BR): <input type="number" id="br" value="1" step="0.1" min="0.5" max="2" class="bg-gray-800 text-white w-16 text-center"></label><br>
+    <label>Emoción (BE): <input type="number" id="be" value="1" step="0.1" min="0.5" max="2" class="bg-gray-800 text-white w-16 text-center"></label><br>
+    <label>Flexibilidad (BC): <input type="number" id="bc" value="1" step="0.1" min="0.5" max="2" class="bg-gray-800 text-white w-16 text-center"></label>
+  </div>
+
+  <button onclick="calcular()" class="w-full bg-green-500 hover:bg-green-600 py-4 rounded-xl text-xl font-bold">CALCULAR PNR</button>
+</div>
+
+<div id="resultados" class="mt-8 hidden bg-gray-900 p-6 rounded-2xl border border-green-500">
+  <h3 class="text-xl font-bold mb-4">Resultados SMA-03</h3>
+  <p id="ii_struct">II Estructural: <span class="font-mono"></span></p>
+  <p id="ii_ext">II Extendido (cognitivo + biológico): <span class="font-mono"></span></p>
+  <p id="pnr" class="text-2xl font-bold mt-4"></p>
+  <p id="recom" class="mt-4 text-sm"></p>
+</div>
+
+<script>
+// Función principal (calcula exactamente como en el paper)
+function calcular() {
+  const pe = parseFloat(document.getElementById('pe').value);
+  const pr = parseFloat(document.getElementById('pr').value);
+  const pl = parseFloat(document.getElementById('pl').value);
+  const ps = parseFloat(document.getElementById('ps').value);
+  const pm = parseFloat(document.getElementById('pm').value);
+
+  const c = parseFloat(document.getElementById('c').value);
+  const i = parseFloat(document.getElementById('i').value);
+  const s = parseFloat(document.getElementById('s').value);
+  const A = (c + i + s) / 15; // normalizado 0-1
+
+  const br = parseFloat(document.getElementById('br').value);
+  const be = parseFloat(document.getElementById('be').value);
+  const bc = parseFloat(document.getElementById('bc').value);
+  const B = (br + be + bc) / 3; // promedio
+
+  // Cálculo exacto del paper (ecuación 7 simplificada)
+  const pressures = [pe, pr, pl, ps, pm];
+  let product = 1;
+  for (let p of pressures) {
+    product *= (1 - p * A * B);
+  }
+  const II = (1 - product) * 1.0; // D(t)=1 para versión Lite
+
+  const pnr = II >= 0.75;
+
+  // Mostrar resultados
+  document.getElementById('resultados').classList.remove('hidden');
+  document.getElementById('ii_struct').innerHTML = `II Estructural: <span class="font-mono">${(1 - pressures.reduce((a,b)=>a*(1-b),1)).toFixed(3)}</span>`;
+  document.getElementById('ii_ext').innerHTML = `II Extendido: <span class="font-mono text-green-400">${II.toFixed(3)}</span>`;
+  document.getElementById('pnr').innerHTML = pnr 
+    ? '🔴 PUNTO DE NO RETORNO ALCANZADO' 
+    : '🟢 Aún reversible';
+  document.getElementById('recom').innerHTML = pnr 
+    ? '¡Alarma! La decisión ya es irreversible. Recomendación: activa protocolo de salida inmediata.' 
+    : 'Todavía hay margen. Monitorea especialmente la creencia de Identidad (I).';
+}
+</script>
+</body>
+                              </html>
