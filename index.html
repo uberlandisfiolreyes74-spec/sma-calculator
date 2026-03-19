@@ -1,19 +1,19 @@
-Hu<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMA-03 Lite Calculator - Punto de No Retorno</title>
+<title>SMA-03 Lite - Punto de No Retorno</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<style>body{background:#0f172a;color:white} input[type=range]{accent-color:#22c55e}</style>
+<style>body{background:#0f172a;color:white}input[type=range]{accent-color:#22c55e}</style>
 </head>
 <body class="p-6 max-w-lg mx-auto">
+
 <h1 class="text-3xl font-bold text-center mb-2 text-green-400">SMA-03 Lite</h1>
 <p class="text-center text-sm mb-8">Predice el Punto de No Retorno • 80% precisión validada</p>
 
 <div class="space-y-8">
-  <!-- Presiones estructurales -->
   <div>
     <h2 class="text-xl font-bold mb-4">1. Presiones Estructurales (0-1)</h2>
     <div class="space-y-5">
@@ -25,7 +25,6 @@ Hu<!DOCTYPE html>
     </div>
   </div>
 
-  <!-- Creencias -->
   <div>
     <h2 class="text-xl font-bold mb-4">2. Creencias (1-5)</h2>
     <div class="grid grid-cols-3 gap-4">
@@ -35,7 +34,6 @@ Hu<!DOCTYPE html>
     </div>
   </div>
 
-  <!-- Biológico -->
   <div>
     <h2 class="text-xl font-bold mb-4">3. Factores Biológicos</h2>
     <div class="grid grid-cols-3 gap-4">
@@ -62,16 +60,13 @@ function calcular(){
   const p = [parseFloat(document.getElementById('pe').value),parseFloat(document.getElementById('pr').value),parseFloat(document.getElementById('pl').value),parseFloat(document.getElementById('ps').value),parseFloat(document.getElementById('pm').value)];
   const A = (parseFloat(document.getElementById('c').value)+parseFloat(document.getElementById('i').value)+parseFloat(document.getElementById('s').value))/15;
   const B = (parseFloat(document.getElementById('br').value)+parseFloat(document.getElementById('be').value)+parseFloat(document.getElementById('bc').value))/3;
-  
   let prod=1; for(let i=0;i<5;i++) prod*=(1-p[i]*A*B);
   const II=(1-prod)*1.0;
   const pnr=II>=0.75;
-  
   document.getElementById('resultados').classList.remove('hidden');
   document.getElementById('ii_ext').innerHTML=`II Extendido: <span class="text-green-400">${II.toFixed(3)}</span>`;
   document.getElementById('pnr').innerHTML=pnr?'🔴 PUNTO DE NO RETORNO ALCANZADO':'🟢 Aún reversible';
   document.getElementById('recom').innerHTML=pnr?'¡Alarma! Activa protocolo de salida inmediata.':'Todavía hay margen. Monitorea especialmente la Identidad (I).';
-  
   new Chart(document.getElementById('chart'),{type:'bar',data:{labels:['Estructural','Extendido'],datasets:[{label:'Índice',data:[(1-p.reduce((a,b)=>a*(1-b),1)).toFixed(3),II.toFixed(3)],backgroundColor:['#64748b','#22c55e']}]}});
 }
 </script>
