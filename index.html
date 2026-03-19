@@ -72,9 +72,8 @@ function calcular(){
   document.getElementById('pnr').innerHTML=pnr?'🔴 PUNTO DE NO RETORNO ALCANZADO':'🟢 Aún reversible';
   document.getElementById('recom').innerHTML=pnr?'¡Alarma! Activa protocolo de salida inmediata.':'Todavía hay margen. Monitorea especialmente la Identidad (I).';
   
-  // Gráfico simple
   new Chart(document.getElementById('chart'),{type:'bar',data:{labels:['Estructural','Extendido'],datasets:[{label:'Índice',data:[(1-p.reduce((a,b)=>a*(1-b),1)).toFixed(3),II.toFixed(3)],backgroundColor:['#64748b','#22c55e']}]}});
 }
 </script>
 </body>
-    </html>
+</html>
