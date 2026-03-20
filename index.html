@@ -2,73 +2,118 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMA-03 Lite Calculator</title>
+<title>SMA-03</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<style>body{background:#0f172a;color:white}input[type=range]{accent-color:#22c55e}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
-<body class="p-6 max-w-lg mx-auto">
 
-<h1 class="text-3xl font-bold text-center mb-2 text-green-400">SMA-03 Lite</h1>
-<p class="text-center text-sm mb-8">Predice el Punto de No Retorno • 80% precisión validada</p>
+<body class="bg-black text-white">
 
-<div class="space-y-8">
-  <div>
-    <h2 class="text-xl font-bold mb-4">1. Presiones Estructurales (0-1)</h2>
-    <div class="space-y-5">
-      <div><label class="block text-sm">Económica (PE): <span id="pe_val" class="font-mono">0.50</span></label><input type="range" id="pe" min="0" max="1" step="0.01" value="0.5" class="w-full" oninput="updateVal(this)"></div>
-      <div><label class="block text-sm">Reputacional (PR): <span id="pr_val" class="font-mono">0.50</span></label><input type="range" id="pr" min="0" max="1" step="0.01" value="0.5" class="w-full" oninput="updateVal(this)"></div>
-      <div><label class="block text-sm">Relacional (PL): <span id="pl_val" class="font-mono">0.50</span></label><input type="range" id="pl" min="0" max="1" step="0.01" value="0.5" class="w-full" oninput="updateVal(this)"></div>
-      <div><label class="block text-sm">Estratégica (PS): <span id="ps_val" class="font-mono">0.50</span></label><input type="range" id="ps" min="0" max="1" step="0.01" value="0.5" class="w-full" oninput="updateVal(this)"></div>
-      <div><label class="block text-sm">Emocional (PM): <span id="pm_val" class="font-mono">0.50</span></label><input type="range" id="pm" min="0" max="1" step="0.01" value="0.5" class="w-full" oninput="updateVal(this)"></div>
-    </div>
-  </div>
+<div class="max-w-xl mx-auto p-6 space-y-6">
 
-  <div>
-    <h2 class="text-xl font-bold mb-4">2. Creencias (1-5)</h2>
-    <div class="grid grid-cols-3 gap-4">
-      <div><label class="block text-sm">Causal (C)</label><input type="number" id="c" value="3" min="1" max="5" class="w-full bg-gray-800 p-2 rounded text-center"></div>
-      <div><label class="block text-sm">Identidad (I)</label><input type="number" id="i" value="3" min="1" max="5" class="w-full bg-gray-800 p-2 rounded text-center"></div>
-      <div><label class="block text-sm">Significado (S)</label><input type="number" id="s" value="3" min="1" max="5" class="w-full bg-gray-800 p-2 rounded text-center"></div>
-    </div>
-  </div>
+<h1 class="text-2xl font-bold text-center">
+Análisis de Decisión SMA-03
+</h1>
 
-  <div>
-    <h2 class="text-xl font-bold mb-4">3. Factores Biológicos</h2>
-    <div class="grid grid-cols-3 gap-4">
-      <div><label class="block text-sm">Riesgo (BR)</label><input type="number" id="br" value="1.0" step="0.1" class="w-full bg-gray-800 p-2 rounded text-center"></div>
-      <div><label class="block text-sm">Emoción (BE)</label><input type="number" id="be" value="1.0" step="0.1" class="w-full bg-gray-800 p-2 rounded text-center"></div>
-      <div><label class="block text-sm">Flexibilidad (BC)</label><input type="number" id="bc" value="1.0" step="0.1" class="w-full bg-gray-800 p-2 rounded text-center"></div>
-    </div>
-  </div>
+<input id="nombre" placeholder="Tu nombre" class="w-full p-2 text-black rounded">
 
-  <button onclick="calcular()" class="w-full bg-green-500 hover:bg-green-600 py-5 rounded-2xl text-2xl font-bold">CALCULAR PNR</button>
-</div>
+<label>Presión externa</label>
+<input id="p" type="range" min="0" max="1" step="0.1" value="0.5">
 
-<div id="resultados" class="hidden mt-10 bg-gray-900 p-8 rounded-3xl border-2 border-green-500">
-  <h3 class="text-2xl font-bold mb-6 text-center">Resultados SMA-03</h3>
-  <p id="ii_ext" class="text-xl font-mono mb-4"></p>
-  <p id="pnr" class="text-4xl font-bold text-center my-6"></p>
-  <canvas id="chart" class="w-full h-48"></canvas>
-  <p id="recom" class="mt-6 text-sm"></p>
+<label>Compromiso</label>
+<input id="a" type="range" min="0" max="1" step="0.1" value="0.5">
+
+<label>Causalidad</label>
+<input id="c" type="range" min="1" max="5" value="3">
+
+<label>Impacto en identidad</label>
+<input id="i" type="range" min="1" max="5" value="3">
+
+<label>Significado</label>
+<input id="s" type="range" min="1" max="5" value="3">
+
+<button onclick="calcular()" class="w-full bg-green-500 p-3 rounded">
+Analizar
+</button>
+
+<div id="resultado" class="hidden bg-gray-800 p-4 rounded"></div>
+
+<button id="btnPDF" onclick="generarPDF()" 
+class="hidden w-full bg-blue-500 p-3 rounded">
+Descargar PDF
+</button>
+
 </div>
 
 <script>
-function updateVal(slider){document.getElementById(slider.id+'_val').textContent=slider.value;}
-function calcular(){
-  const p = [parseFloat(document.getElementById('pe').value),parseFloat(document.getElementById('pr').value),parseFloat(document.getElementById('pl').value),parseFloat(document.getElementById('ps').value),parseFloat(document.getElementById('pm').value)];
-  const A = (parseFloat(document.getElementById('c').value)+parseFloat(document.getElementById('i').value)+parseFloat(document.getElementById('s').value))/15;
-  const B = (parseFloat(document.getElementById('br').value)+parseFloat(document.getElementById('be').value)+parseFloat(document.getElementById('bc').value))/3;
-  let prod=1; for(let i=0;i<5;i++) prod*=(1-p[i]*A*B);
-  const II=(1-prod)*1.0;
-  const pnr=II>=0.75;
-  document.getElementById('resultados').classList.remove('hidden');
-  document.getElementById('ii_ext').innerHTML=`II Extendido: <span class="text-green-400">${II.toFixed(3)}</span>`;
-  document.getElementById('pnr').innerHTML=pnr?'🔴 PUNTO DE NO RETORNO ALCANZADO':'🟢 Aún reversible';
-  document.getElementById('recom').innerHTML=pnr?'¡Alarma! Activa protocolo de salida inmediata.':'Todavía hay margen. Monitorea especialmente la Identidad (I).';
-  new Chart(document.getElementById('chart'),{type:'bar',data:{labels:['Estructural','Extendido'],datasets:[{label:'Índice',data:[(1-p.reduce((a,b)=>a*(1-b),1)).toFixed(3),II.toFixed(3)],backgroundColor:['#64748b','#22c55e']}]}});
+
+function sigmoid(x){
+    return 1 / (1 + Math.exp(-x));
 }
+
+function calcular(){
+
+    let P = parseFloat(document.getElementById("p").value);
+    let A = parseFloat(document.getElementById("a").value);
+    let C = parseFloat(document.getElementById("c").value) / 5;
+    let I = parseFloat(document.getElementById("i").value) / 5;
+    let S = parseFloat(document.getElementById("s").value) / 5;
+
+    let score = (P + A + C + I + S) / 5;
+    let PNR = sigmoid(score * 5 - 2.5);
+
+    let riesgo = "";
+    let recomendacion = "";
+
+    if (PNR < 0.4){
+        riesgo = "Bajo";
+        recomendacion = "Puedes avanzar con flexibilidad.";
+    } 
+    else if (PNR < 0.7){
+        riesgo = "Moderado";
+        recomendacion = "Mantén control y evita comprometerte demasiado.";
+    } 
+    else {
+        riesgo = "Alto";
+        recomendacion = "Reduce compromiso y busca reversibilidad.";
+    }
+
+    let resultadoHTML = `
+    <h3 class="text-lg font-bold">Resultado</h3>
+    <p>PNR: ${PNR.toFixed(2)}</p>
+    <p>Riesgo: ${riesgo}</p>
+    <p>Recomendación: ${recomendacion}</p>
+    `;
+
+    document.getElementById("resultado").innerHTML = resultadoHTML;
+    document.getElementById("resultado").classList.remove("hidden");
+
+    document.getElementById("btnPDF").classList.remove("hidden");
+}
+
+function generarPDF(){
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let nombre = document.getElementById("nombre").value || "Cliente";
+    let contenido = document.getElementById("resultado").innerText;
+
+    doc.setFontSize(16);
+    doc.text("Informe SMA-03", 10, 15);
+
+    doc.setFontSize(12);
+    doc.text("Cliente: " + nombre, 10, 25);
+
+    let text = doc.splitTextToSize(contenido, 180);
+    doc.text(text, 10, 40);
+
+    doc.save("Informe_SMA03.pdf");
+}
+
 </script>
+
 </body>
-  </html>
+</html>
